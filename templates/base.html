@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SkyHire - Job Application Tracker{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body class="min-h-full flex flex-col font-sans text-slate-800 bg-[#f8fbfe]">
+
+    <!-- Demo Role Quick Bar (Top Helper) -->
+    <div class="bg-brand-900 text-brand-100 text-xs py-1.5 px-4">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center space-x-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-700 text-brand-100">Demo Quick Switcher</span>
+                <span class="text-brand-300">Test roles with one click:</span>
+                <a href="{{ url_for('quick_login', role='admin') }}" class="font-medium underline hover:text-white transition">Admin (Elena Vance)</a>
+                <span class="text-brand-500">•</span>
+                <a href="{{ url_for('quick_login', role='candidate') }}" class="font-medium underline hover:text-white transition">Candidate (Sarah Miller)</a>
+            </div>
+            <div class="flex items-center space-x-3 text-brand-300">
+                {% if current_user.is_authenticated %}
+                    <span>Signed in as: <strong class="text-white">{{ current_user.full_name }}</strong> (<span class="uppercase tracking-wider font-semibold text-brand-300">{{ current_user.role }}</span>)</span>
+                {% else %}
+                    <span>Not logged in</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-brand-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-18 py-3">
+                <!-- Brand Logo -->
+                <div class="flex items-center space-x-8">
+                    <a href="{{ url_for('index') }}" class="flex items-center space-x-2.5 group">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-brand-500 to-brand-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition transform">
+                            <i data-lucide="compass" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-1.5">
+                                <span class="text-xl font-extrabold tracking-tight text-slate-900">Sky<span class="text-brand-600">Hire</span></span>
+                                <span class="bg-brand-50 text-brand-600 border border-brand-200 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">ATS</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 font-medium -mt-0.5">Job Application Tracker</p>
+                        </div>
+                    </a>
+
+                    <!-- Main Navigation Links -->
+                    <nav class="hidden md:flex items-center space-x-1">
+                        <a href="{{ url_for('index') }}" class="px-3.5 py-2 rounded-lg text-sm font-semibold transition {% if request.endpoint == 'index' %}text-brand-700 bg-brand-50{% else %}text-slate-600 hover:text-brand-600 hover:bg-slate-50{% endif %}">
+                            Home
+                        </a>
+                        <a href="{{ url_for('jobs') }}" class="px-3.5 py-2 rounded-lg text-sm font-semibold transition {% if request.endpoint in ['jobs', 'job_detail', 'apply_job'] %}text-brand-700 bg-brand-50{% else %}text-slate-600 hover:text-brand-600 hover:bg-slate-50{% endif %}">
+                            Find Jobs
+                        </a>
+                        {% if current_user.is_authenticated and not current_user.is_admin %}
+                        <a href="{{ url_for('my_applications') }}" class="px-3.5 py-2 rounded-lg text-sm font-semibold transition {% if request.endpoint == 'my_applications' %}text-brand-700 bg-brand-50{% else %}text-slate-600 hover:text-brand-600 hover:bg-slate-50{% endif %}">
+                            My Applications
+                        </a>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.is_admin %}
+                        <div class="flex items-center pl-2 ml-2 border-l border-slate-200 space-x-1">
+                            <a href="{{ url_for('admin_dashboard') }}" class="px-3 py-1.5 rounded-lg text-sm font-semibold transition {% if request.endpoint == 'admin_dashboard' %}text-brand-700 bg-brand-100{% else %}text-slate-600 hover:text-brand-700 hover:bg-brand-50{% endif %}">
+                                Admin Dashboard
+                            </a>
+                            <a href="{{ url_for('admin_jobs') }}" class="px-3 py-1.5 rounded-lg text-sm font-semibold transition {% if request.endpoint in ['admin_jobs', 'admin_create_job', 'admin_edit_job'] %}text-brand-700 bg-brand-100{% else %}text-slate-600 hover:text-brand-700 hover:bg-brand-50{% endif %}">
+                                Manage Jobs
+                            </a>
+                            <a href="{{ url_for('admin_applications') }}" class="px-3 py-1.5 rounded-lg text-sm font-semibold transition {% if request.endpoint in ['admin_applications', 'admin_application_detail'] %}text-brand-700 bg-brand-100{% else %}text-slate-600 hover:text-brand-700 hover:bg-brand-50{% endif %}">
+                                Review Applicants
+                            </a>
+                        </div>
+                        {% endif %}
+                    </nav>
+                </div>
+
+                <!-- Right Action Bar -->
+                <div class="flex items-center space-x-3">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_admin %}
+                            <a href="{{ url_for('admin_create_job') }}" class="hidden sm:inline-flex items-center space-x-1.5 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm shadow-brand-500/25 transition">
+                                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                                <span>Post a Job</span>
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('my_applications') }}" class="hidden sm:inline-flex items-center space-x-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 px-3.5 py-2 rounded-xl text-sm font-semibold transition">
+                                <i data-lucide="file-check" class="w-4 h-4"></i>
+                                <span>Track Status</span>
+                            </a>
+                        {% endif %}
+
+                        <!-- User Profile Dropdown Menu -->
+                        <div class="relative flex items-center space-x-2 pl-2">
+                            <div class="flex flex-col text-right hidden lg:block">
+                                <span class="text-xs font-bold text-slate-800 leading-tight">{{ current_user.full_name }}</span>
+                                <span class="text-[11px] text-brand-600 font-medium capitalize">{{ current_user.role }}</span>
+                            </div>
+                            <div class="w-9 h-9 rounded-full bg-brand-100 border border-brand-300 text-brand-700 flex items-center justify-center font-bold text-sm">
+                                {{ current_user.full_name[:1] }}
+                            </div>
+                            <a href="{{ url_for('logout') }}" title="Logout" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition">
+                                <i data-lucide="log-out" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="text-sm font-semibold text-slate-700 hover:text-brand-600 px-3 py-2 transition">
+                            Sign In
+                        </a>
+                        <a href="{{ url_for('register') }}" class="inline-flex items-center space-x-1.5 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm shadow-brand-500/25 transition">
+                            <span>Get Started</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Messages Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="space-y-2">
+                    {% for category, message in messages %}
+                        {% set cat_colors = {
+                            'success': 'bg-emerald-50 text-emerald-800 border-emerald-200 icon-check-circle',
+                            'danger': 'bg-rose-50 text-rose-800 border-rose-200 icon-alert-octagon',
+                            'warning': 'bg-amber-50 text-amber-800 border-amber-200 icon-alert-triangle',
+                            'info': 'bg-brand-50 text-brand-800 border-brand-200 icon-info'
+                        } %}
+                        <div class="flex items-center justify-between p-3.5 rounded-xl border {{ cat_colors.get(category, 'bg-brand-50 text-brand-800 border-brand-200') }} shadow-sm">
+                            <div class="flex items-center space-x-3">
+                                <i data-lucide="bell" class="w-5 h-5 flex-shrink-0 opacity-80"></i>
+                                <span class="text-sm font-medium">{{ message }}</span>
+                            </div>
+                            <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600 p-1">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Global Job Share Modal -->
+    <div id="share-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="if(event.target === this) closeShareModal();">
+        <div class="bg-white rounded-3xl border border-brand-100 shadow-2xl max-w-md w-full p-6 sm:p-7 space-y-5 relative transform transition-all animate-in fade-in zoom-in-95 duration-200">
+            <!-- Modal Header -->
+            <div class="flex items-start justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center font-bold">
+                        <i data-lucide="share-2" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-extrabold text-slate-900">Share Job Opening</h3>
+                        <p class="text-xs text-slate-500">Spread the word or share with a peer</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeShareModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-100 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Job Highlight Preview -->
+            <div class="p-3.5 rounded-2xl bg-brand-50/60 border border-brand-200/70 space-y-1">
+                <span id="share-modal-department" class="text-[10px] font-bold uppercase tracking-wider text-brand-700 block">Engineering</span>
+                <h4 id="share-modal-job-title" class="text-sm font-bold text-slate-900 leading-snug">Senior Full-Stack Engineer</h4>
+            </div>
+
+            <!-- Link Box -->
+            <div class="space-y-1.5">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Job Link</label>
+                <div class="flex items-center space-x-2">
+                    <div class="relative flex-1">
+                        <input id="share-modal-url-input" type="text" readonly class="w-full pl-9 pr-3 py-2.5 text-xs font-mono rounded-xl border border-slate-200 bg-slate-50 text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-200 select-all cursor-pointer" onclick="this.select()">
+                        <i data-lucide="link" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                    </div>
+                    <button type="button" onclick="copyModalShareLink()" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-brand-500/20 transition flex items-center space-x-1.5 flex-shrink-0">
+                        <i id="share-copy-icon" data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        <span id="share-copy-label">Copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Share Options Grid -->
+            <div class="space-y-2 pt-2 border-t border-slate-100">
+                <span class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Share To Platforms</span>
+                <div class="grid grid-cols-4 gap-2.5">
+                    <!-- LinkedIn -->
+                    <a id="share-btn-linkedin" href="#" target="_blank" rel="noopener noreferrer" class="flex flex-col items-center justify-center p-3 rounded-2xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 text-slate-700 hover:text-blue-700 transition group">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-1 group-hover:scale-110 transition">
+                            <i data-lucide="linkedin" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-[11px] font-bold">LinkedIn</span>
+                    </a>
+
+                    <!-- Twitter / X -->
+                    <a id="share-btn-twitter" href="#" target="_blank" rel="noopener noreferrer" class="flex flex-col items-center justify-center p-3 rounded-2xl border border-slate-200 hover:border-slate-800 hover:bg-slate-50 text-slate-700 hover:text-slate-900 transition group">
+                        <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center mb-1 group-hover:scale-110 transition">
+                            <i data-lucide="twitter" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-[11px] font-bold">X (Twitter)</span>
+                    </a>
+
+                    <!-- WhatsApp -->
+                    <a id="share-btn-whatsapp" href="#" target="_blank" rel="noopener noreferrer" class="flex flex-col items-center justify-center p-3 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 text-slate-700 hover:text-emerald-700 transition group">
+                        <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-1 group-hover:scale-110 transition">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-[11px] font-bold">WhatsApp</span>
+                    </a>
+
+                    <!-- Email -->
+                    <a id="share-btn-email" href="#" class="flex flex-col items-center justify-center p-3 rounded-2xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50/50 text-slate-700 hover:text-brand-700 transition group">
+                        <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center mb-1 group-hover:scale-110 transition">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-[11px] font-bold">Email</span>
+                    </a>
+                </div>
+
+                <!-- Native Device Share Sheet -->
+                <button id="share-btn-native" type="button" class="w-full mt-2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 hidden">
+                    <i data-lucide="share" class="w-3.5 h-3.5"></i>
+                    <span>Share via Device Apps</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-brand-100 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white shadow-sm">
+                        <i data-lucide="compass" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="font-extrabold text-slate-900 tracking-tight">Sky<span class="text-brand-600">Hire</span></span>
+                        <p class="text-xs text-slate-500">Light Blue & White Job Application Tracking System</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-6 text-sm text-slate-600">
+                    <a href="{{ url_for('jobs') }}" class="hover:text-brand-600 transition">Job Directory</a>
+                    <a href="{{ url_for('login') }}" class="hover:text-brand-600 transition">Candidate Login</a>
+                    <a href="{{ url_for('admin_dashboard') }}" class="hover:text-brand-600 transition">Recruiter Portal</a>
+                </div>
+
+                <div class="text-xs text-slate-600 text-center md:text-right">
+                    <p>© 2026 SkyHire Platform. Designed with clarity & trust.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Initialize Lucide Icons & App Script -->
+    <script>
+        lucide.createIcons();
+    </script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+

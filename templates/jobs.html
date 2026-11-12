@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Jobs - SkyHire Application Tracker{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+    <!-- Page Header Banner -->
+    <div class="bg-gradient-to-r from-brand-600 via-brand-500 to-sky-400 rounded-3xl p-8 sm:p-10 text-white shadow-lg shadow-brand-500/15 relative overflow-hidden">
+        <div class="relative z-10 max-w-2xl space-y-2">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur text-white">
+                Live Opportunities
+            </span>
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Available Positions</h1>
+            <p class="text-brand-100 text-sm sm:text-base">
+                Discover your next career leap. Apply in seconds and track your status in real-time.
+            </p>
+        </div>
+        <div class="absolute right-0 bottom-0 translate-x-12 translate-y-8 opacity-15 pointer-events-none">
+            <i data-lucide="compass" class="w-72 h-72 text-white"></i>
+        </div>
+    </div>
+
+    <!-- Layout: Filters + Job Listings -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        
+        <!-- Filter Sidebar -->
+        <aside class="lg:col-span-1">
+            <div class="bg-white rounded-2xl border border-brand-100 p-6 shadow-sm sticky top-24 space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4 text-brand-600"></i>
+                        <span>Filter Roles</span>
+                    </h2>
+                    <a href="{{ url_for('jobs') }}" class="text-xs font-semibold text-brand-600 hover:text-brand-800 transition">
+                        Reset All
+                    </a>
+                </div>
+
+                <form method="GET" action="{{ url_for('jobs') }}" class="space-y-5">
+                    <!-- Search Input -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Keyword</label>
+                        <div class="relative">
+                            <input type="text" name="q" value="{{ current_filters.q }}" placeholder="Title or keyword..." class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                        </div>
+                    </div>
+
+                    <!-- Department -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Department</label>
+                        <select name="department" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 bg-white">
+                            <option value="">All Departments</option>
+                            {% for dept in departments %}
+                                <option value="{{ dept }}" {% if current_filters.department == dept %}selected{% endif %}>{{ dept }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Job Type -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Job Type</label>
+                        <select name="job_type" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 bg-white">
+                            <option value="">All Types</option>
+                            {% for jt in job_types %}
+                                <option value="{{ jt }}" {% if current_filters.job_type == jt %}selected{% endif %}>{{ jt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Experience Level -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Experience</label>
+                        <select name="experience" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 bg-white">
+                            <option value="">All Levels</option>
+                            {% for exp in experiences %}
+                                <option value="{{ exp }}" {% if current_filters.experience == exp %}selected{% endif %}>{{ exp }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Location Input -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Location</label>
+                        <div class="relative">
+                            <input type="text" name="location" value="{{ current_filters.location }}" placeholder="e.g. Remote, NY..." class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition shadow-sm shadow-brand-500/25 flex items-center justify-center space-x-1.5">
+                        <i data-lucide="filter" class="w-4 h-4"></i>
+                        <span>Apply Filters</span>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Main Listings Content -->
+        <main class="lg:col-span-3 space-y-4">
+            
+            <!-- Result count & summary -->
+            <div class="flex items-center justify-between bg-white px-5 py-3 rounded-2xl border border-brand-100 shadow-sm text-sm">
+                <span class="text-slate-600 font-medium">
+                    Found <strong class="text-slate-900">{{ jobs|length }}</strong> available position{{ 's' if jobs|length != 1 else '' }}
+                </span>
+                {% if current_filters.q or current_filters.department or current_filters.job_type or current_filters.experience or current_filters.location %}
+                    <span class="text-xs text-brand-600 font-semibold bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200">
+                        Filters Active
+                    </span>
+                {% endif %}
+            </div>
+
+            <!-- Job Cards List -->
+            {% if jobs %}
+                <div class="space-y-4">
+                    {% for job in jobs %}
+                        <div class="bg-white rounded-2xl border border-brand-100 p-6 shadow-sm hover:shadow-md hover:border-brand-300 transition duration-200 group">
+                            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                                <div class="space-y-2 flex-1">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200">
+                                            {{ job.department }}
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-700">
+                                            {{ job.job_type }}
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-700">
+                                            {{ job.experience_level }}
+                                        </span>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-slate-900 group-hover:text-brand-600 transition">
+                                        <a href="{{ url_for('job_detail', job_id=job.id) }}">{{ job.title }}</a>
+                                    </h3>
+                                    <p class="text-sm text-slate-600 line-clamp-2 leading-relaxed">
+                                        {{ job.description }}
+                                    </p>
+                                    <div class="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-2">
+                                        <span class="inline-flex items-center">
+                                            <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1 text-brand-500"></i>
+                                            {{ job.location }}
+                                        </span>
+                                        <span class="inline-flex items-center font-semibold text-slate-700">
+                                            <i data-lucide="banknote" class="w-3.5 h-3.5 mr-1 text-brand-500"></i>
+                                            {{ job.salary_range or 'Competitive Salary' }}
+                                        </span>
+                                        <span class="inline-flex items-center">
+                                            <i data-lucide="calendar" class="w-3.5 h-3.5 mr-1 text-slate-400"></i>
+                                            Posted {{ job.created_at.strftime('%b %d, %Y') }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="sm:text-right flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                                    <div class="flex items-center space-x-2">
+                                        <button type="button" onclick="quickShareJob(event, '{{ job.title }}', '{{ url_for('job_detail', job_id=job.id) }}', '{{ job.department }}')" title="Share Job" class="p-2 rounded-xl text-slate-400 hover:text-brand-600 hover:bg-brand-50 border border-slate-200 hover:border-brand-300 transition">
+                                            <i data-lucide="share-2" class="w-4 h-4"></i>
+                                        </button>
+                                        {% if job.id in applied_job_ids %}
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                <i data-lucide="check-circle" class="w-4 h-4 mr-1 text-emerald-600"></i> Applied
+                                            </span>
+                                        {% else %}
+                                            <a href="{{ url_for('job_detail', job_id=job.id) }}" class="inline-flex items-center space-x-1 px-4 py-2 rounded-xl text-sm font-semibold bg-brand-600 hover:bg-brand-700 text-white shadow-sm shadow-brand-500/20 transition">
+                                                <span>Apply</span>
+                                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    {% if job.id in applied_job_ids %}
+                                        <a href="{{ url_for('my_applications') }}" class="text-xs font-semibold text-brand-600 hover:text-brand-800 underline">
+                                            View in Tracker →
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="bg-white rounded-2xl border border-brand-100 p-12 text-center shadow-sm space-y-4">
+                    <div class="w-16 h-16 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
+                        <i data-lucide="briefcase" class="w-8 h-8"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h3 class="text-lg font-bold text-slate-900">No positions matched your search</h3>
+                        <p class="text-sm text-slate-500 max-w-md mx-auto">
+                            Try adjusting your filters, clearing keywords, or check back soon as new positions are posted regularly.
+                        </p>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('jobs') }}" class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-brand-50 text-brand-700 border border-brand-200 hover:bg-brand-100 transition">
+                            Clear Filters
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+
+        </main>
+    </div>
+
+</div>
+{% endblock %}
+

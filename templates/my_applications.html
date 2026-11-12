@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}My Applications Tracker - SkyHire{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- Header & Summary Cards -->
+    <div class="space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-brand-600">Candidate Workspace</span>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Application Tracker</h1>
+                <p class="text-sm text-slate-500 mt-0.5">Real-time status updates and recruiter feedback for your submissions.</p>
+            </div>
+            <a href="{{ url_for('jobs') }}" class="inline-flex items-center space-x-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold shadow-sm shadow-brand-500/25 transition">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Explore More Openings</span>
+            </a>
+        </div>
+
+        <!-- Metrics Row -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center font-bold">
+                    <i data-lucide="folder-kanban" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <div class="text-2xl font-extrabold text-slate-900">{{ stats.total }}</div>
+                    <div class="text-xs font-semibold text-slate-500">Total Applied</div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
+                    <i data-lucide="hourglass" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <div class="text-2xl font-extrabold text-sky-600">{{ stats.active }}</div>
+                    <div class="text-xs font-semibold text-slate-500">In Progress</div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                    <i data-lucide="video" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <div class="text-2xl font-extrabold text-indigo-600">{{ stats.interviews }}</div>
+                    <div class="text-xs font-semibold text-slate-500">Interviews</div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                    <i data-lucide="award" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <div class="text-2xl font-extrabold text-emerald-600">{{ stats.offers }}</div>
+                    <div class="text-xs font-semibold text-slate-500">Offers Received</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application List -->
+    {% if applications %}
+        <div class="space-y-6">
+            {% for app_item in applications %}
+                <div class="bg-white rounded-3xl border border-brand-100 p-6 sm:p-8 shadow-sm hover:shadow-md transition space-y-6">
+                    
+                    <!-- Card Top Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200">
+                                    {{ app_item.job.department }}
+                                </span>
+                                <span class="text-xs text-slate-400">•</span>
+                                <span class="text-xs text-slate-500">Submitted {{ app_item.applied_at.strftime('%B %d, %Y') }}</span>
+                            </div>
+                            <h2 class="text-xl font-extrabold text-slate-900 hover:text-brand-600 transition">
+                                <a href="{{ url_for('job_detail', job_id=app_item.job.id) }}">{{ app_item.job.title }}</a>
+                            </h2>
+                            <div class="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-0.5">
+                                <span class="flex items-center">
+                                    <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1 text-brand-500"></i> {{ app_item.job.location }}
+                                </span>
+                                <span class="flex items-center">
+                                    <i data-lucide="briefcase" class="w-3.5 h-3.5 mr-1 text-brand-500"></i> {{ app_item.job.job_type }}
+                                </span>
+                                <span class="flex items-center font-semibold text-slate-700">
+                                    <i data-lucide="banknote" class="w-3.5 h-3.5 mr-1 text-brand-500"></i> {{ app_item.job.salary_range or 'Competitive' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Current Status Badge -->
+                        <div class="flex sm:flex-col items-start sm:items-end justify-between sm:justify-center gap-2">
+                            <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-extrabold border shadow-sm {{ app_item.status_badge_class }}">
+                                <span class="w-2 h-2 rounded-full mr-2 bg-current animate-ping opacity-75"></span>
+                                {{ app_item.status_label }}
+                            </span>
+                            <span class="text-[11px] text-slate-400">
+                                Updated {{ app_item.updated_at.strftime('%b %d') }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Visual Progress Pipeline -->
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Hiring Stage Progress</div>
+                        
+                        {% set stages = [
+                            ('submitted', 'Application Submitted', 'file-check'),
+                            ('under_review', 'Reviewing Profile', 'glasses'),
+                            ('interview_scheduled', 'Interview Stage', 'video'),
+                            ('offer_extended', 'Offer / Decision', 'award')
+                        ] %}
+
+                        {% set status_order = {
+                            'submitted': 1,
+                            'under_review': 2,
+                            'interview_scheduled': 3,
+                            'offer_extended': 4,
+                            'accepted': 4,
+                            'rejected': 4,
+                            'withdrawn': 0
+                        } %}
+                        {% set current_level = status_order.get(app_item.status, 1) %}
+
+                        <div class="relative">
+                            <!-- Background line -->
+                            <div class="hidden sm:block absolute top-1/2 left-0 w-full h-1 bg-slate-100 -translate-y-1/2 z-0"></div>
+                            
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 relative z-10">
+                                {% for code, label, icon_name in stages %}
+                                    {% set stage_idx = loop.index %}
+                                    {% set is_passed = current_level >= stage_idx and app_item.status != 'withdrawn' and app_item.status != 'rejected' %}
+                                    {% set is_current = current_level == stage_idx and app_item.status not in ['withdrawn', 'rejected', 'accepted'] %}
+                                    
+                                    <div class="flex flex-col items-center text-center p-3 rounded-2xl bg-white border sm:border-0 {{ 'border-brand-200 bg-brand-50/50' if is_current else 'border-slate-100' }}">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mb-2 shadow-sm transition
+                                            {% if is_passed %}
+                                                bg-brand-600 text-white ring-4 ring-brand-100
+                                            {% elif is_current %}
+                                                bg-brand-500 text-white ring-4 ring-brand-100 animate-bounce
+                                            {% else %}
+                                                bg-slate-100 text-slate-400 border border-slate-200
+                                            {% endif %}
+                                        ">
+                                            <i data-lucide="{{ icon_name }}" class="w-5 h-5"></i>
+                                        </div>
+                                        <span class="text-xs font-bold {% if is_passed or is_current %}text-slate-900{% else %}text-slate-400{% endif %}">
+                                            {{ label }}
+                                        </span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        {% if app_item.status == 'rejected' %}
+                            <div class="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 flex items-center space-x-2">
+                                <i data-lucide="info" class="w-4 h-4 text-slate-400"></i>
+                                <span>Position closed for this round. We encourage you to apply for other roles!</span>
+                            </div>
+                        {% elif app_item.status == 'withdrawn' %}
+                            <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700 flex items-center space-x-2">
+                                <i data-lucide="alert-circle" class="w-4 h-4 text-amber-500"></i>
+                                <span>You have withdrawn this application.</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Recruiter Note / Candidate Feedback Box -->
+                    {% if app_item.candidate_feedback %}
+                        <div class="bg-gradient-to-r from-brand-50 to-sky-50 rounded-2xl p-4 border border-brand-200 flex items-start space-x-3.5">
+                            <div class="w-9 h-9 rounded-xl bg-white text-brand-600 flex items-center justify-center shadow-sm flex-shrink-0 mt-0.5">
+                                <i data-lucide="message-square" class="w-5 h-5"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-xs font-bold text-brand-900 uppercase tracking-wider">Recruiter Update & Instructions</div>
+                                <p class="text-sm text-brand-800 leading-relaxed font-medium">
+                                    {{ app_item.candidate_feedback }}
+                                </p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Expandable Timeline & Actions -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-slate-100 text-xs">
+                        <div class="flex items-center space-x-4">
+                            {% if app_item.resume_filename %}
+                                <a href="{{ url_for('download_resume', filename=app_item.resume_filename) }}" class="inline-flex items-center text-slate-600 hover:text-brand-600 font-semibold transition">
+                                    <i data-lucide="file-text" class="w-4 h-4 mr-1.5 text-brand-500"></i>
+                                    Download Resume ({{ app_item.resume_original_name or 'Resume.pdf' }})
+                                </a>
+                            {% endif %}
+                            
+                            <button onclick="document.getElementById('timeline-{{ app_item.id }}').classList.toggle('hidden')" class="inline-flex items-center text-brand-600 hover:text-brand-800 font-bold transition">
+                                <i data-lucide="history" class="w-4 h-4 mr-1"></i>
+                                View Activity Log ({{ app_item.timeline_logs.count() }})
+                            </button>
+                        </div>
+
+                        <!-- Withdraw Action -->
+                        {% if app_item.status not in ['withdrawn', 'accepted', 'rejected'] %}
+                            <form action="{{ url_for('withdraw_application', app_id=app_item.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to withdraw this application? This action cannot be undone.');">
+                                <button type="submit" class="text-slate-400 hover:text-rose-600 font-medium transition">
+                                    Withdraw Application
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- Activity Log Hidden Drawer -->
+                    <div id="timeline-{{ app_item.id }}" class="hidden pt-4 border-t border-slate-100">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Status Timeline</h4>
+                        <div class="space-y-3 pl-2 border-l-2 border-brand-200 ml-2">
+                            {% for log in app_item.timeline_logs %}
+                                <div class="relative pl-4 space-y-0.5">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-brand-500 absolute -left-[21px] top-1"></div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-xs font-bold text-slate-800">{{ log.title }}</span>
+                                        <span class="text-[10px] text-slate-400">{{ log.created_at.strftime('%b %d, %Y at %I:%M %p') }}</span>
+                                    </div>
+                                    {% if log.description %}
+                                        <p class="text-xs text-slate-600">{{ log.description }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="bg-white rounded-3xl border border-brand-100 p-12 text-center shadow-sm space-y-4">
+            <div class="w-16 h-16 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
+                <i data-lucide="clipboard-list" class="w-8 h-8"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-lg font-bold text-slate-900">No applications yet</h3>
+                <p class="text-sm text-slate-500 max-w-sm mx-auto">
+                    You haven't applied for any positions yet. Explore our open roles and submit your first application.
+                </p>
+            </div>
+            <div>
+                <a href="{{ url_for('jobs') }}" class="inline-flex items-center space-x-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold shadow-md shadow-brand-500/20 transition">
+                    <span>Browse Open Positions</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+

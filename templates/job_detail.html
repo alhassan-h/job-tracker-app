@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title }} - SkyHire{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-semibold text-slate-500">
+        <a href="{{ url_for('jobs') }}" class="hover:text-brand-600 transition flex items-center">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5 mr-1"></i> All Jobs
+        </a>
+        <span>/</span>
+        <span class="text-brand-600">{{ job.department }}</span>
+        <span>/</span>
+        <span class="text-slate-800 truncate max-w-xs">{{ job.title }}</span>
+    </nav>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Job Description Body -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Job Header Card -->
+            <div class="bg-white rounded-3xl border border-brand-100 p-8 shadow-sm space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-3 py-1 rounded-lg text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200">
+                            {{ job.department }}
+                        </span>
+                        <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">
+                            {{ job.job_type }}
+                        </span>
+                        <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">
+                            {{ job.experience_level }}
+                        </span>
+                        {% if job.status == 'closed' %}
+                            <span class="px-3 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                Position Closed
+                            </span>
+                        {% endif %}
+                    </div>
+                    <!-- Share Button in Job Header -->
+                    <button type="button" onclick="openShareModal('{{ job.title }}', '{{ url_for('job_detail', job_id=job.id) }}', '{{ job.department }}')" class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 transition shadow-sm group">
+                        <i data-lucide="share-2" class="w-3.5 h-3.5 text-brand-600 group-hover:scale-110 transition"></i>
+                        <span>Share Job</span>
+                    </button>
+                </div>
+
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
+                    {{ job.title }}
+                </h1>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2 text-sm text-slate-600 border-t border-slate-100">
+                    <div>
+                        <span class="text-xs text-slate-400 block font-medium">Location</span>
+                        <span class="font-bold text-slate-800 flex items-center mt-0.5">
+                            <i data-lucide="map-pin" class="w-4 h-4 mr-1 text-brand-500"></i>
+                            {{ job.location }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block font-medium">Compensation</span>
+                        <span class="font-bold text-slate-800 flex items-center mt-0.5">
+                            <i data-lucide="banknote" class="w-4 h-4 mr-1 text-brand-500"></i>
+                            {{ job.salary_range or 'Competitive' }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block font-medium">Date Posted</span>
+                        <span class="font-bold text-slate-800 flex items-center mt-0.5">
+                            <i data-lucide="calendar" class="w-4 h-4 mr-1 text-brand-500"></i>
+                            {{ job.created_at.strftime('%b %d, %Y') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="bg-white rounded-3xl border border-brand-100 p-8 shadow-sm space-y-8">
+                
+                <!-- About Role -->
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900 mb-3 flex items-center space-x-2">
+                        <i data-lucide="file-text" class="w-5 h-5 text-brand-600"></i>
+                        <span>Role Overview</span>
+                    </h2>
+                    <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line prose max-w-none">
+                        {{ job.description }}
+                    </div>
+                </div>
+
+                <!-- Requirements -->
+                {% if job.requirements %}
+                <div class="pt-6 border-t border-slate-100">
+                    <h2 class="text-xl font-bold text-slate-900 mb-3 flex items-center space-x-2">
+                        <i data-lucide="check-square" class="w-5 h-5 text-brand-600"></i>
+                        <span>Qualifications & Requirements</span>
+                    </h2>
+                    <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line">
+                        {{ job.requirements }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Benefits -->
+                {% if job.benefits %}
+                <div class="pt-6 border-t border-slate-100">
+                    <h2 class="text-xl font-bold text-slate-900 mb-3 flex items-center space-x-2">
+                        <i data-lucide="gift" class="w-5 h-5 text-brand-600"></i>
+                        <span>Perks & Benefits</span>
+                    </h2>
+                    <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line">
+                        {{ job.benefits }}
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <!-- Sticky Sidebar Action Box -->
+        <div class="lg:col-span-1 space-y-6">
+            
+            <div class="bg-white rounded-3xl border border-brand-100 p-6 shadow-sm sticky top-24 space-y-5">
+                
+                {% if current_user.is_authenticated and current_user.is_admin %}
+                    <!-- Admin Quick Controls -->
+                    <div class="bg-brand-50 p-4 rounded-2xl border border-brand-200 space-y-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-brand-700 block">Recruiter Quick Controls</span>
+                        <div class="text-xs text-slate-600">
+                            Total Applicants: <strong class="text-brand-900">{{ job.application_count }}</strong>
+                        </div>
+                        <div class="flex flex-col gap-2 pt-1">
+                            <a href="{{ url_for('admin_applications', job_id=job.id) }}" class="w-full py-2 px-3 bg-brand-600 text-white rounded-xl text-xs font-bold text-center hover:bg-brand-700 transition">
+                                View {{ job.application_count }} Applicants
+                            </a>
+                            <a href="{{ url_for('admin_edit_job', job_id=job.id) }}" class="w-full py-2 px-3 bg-white border border-brand-300 text-brand-700 rounded-xl text-xs font-bold text-center hover:bg-brand-50 transition">
+                                Edit Job Details
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if existing_application %}
+                    <!-- Candidate Already Applied Box -->
+                    <div class="bg-emerald-50 rounded-2xl p-5 border border-emerald-200 text-center space-y-3">
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                            <i data-lucide="check-circle-2" class="w-7 h-7"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-emerald-900">Application Submitted!</h3>
+                            <p class="text-xs text-emerald-700 mt-1">
+                                Applied on {{ existing_application.applied_at.strftime('%b %d, %Y') }}
+                            </p>
+                        </div>
+                        <div class="inline-block px-3 py-1 bg-white rounded-lg border border-emerald-300 text-xs font-bold text-emerald-800">
+                            Current Status: {{ existing_application.status_label }}
+                        </div>
+                        <div class="pt-2">
+                            <a href="{{ url_for('my_applications') }}" class="w-full inline-flex items-center justify-center space-x-1.5 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                                <span>Open Tracker Pipeline</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </div>
+                {% elif job.status == 'active' %}
+                    <!-- Apply Now CTA -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-bold text-slate-900">Ready to join our team?</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Submit your application today. We review submissions within 48 hours and keep you notified at every step.
+                        </p>
+                        <a href="{{ url_for('apply_job', job_id=job.id) }}" class="w-full py-3.5 px-6 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl text-sm font-bold shadow-md shadow-brand-500/25 transition flex items-center justify-center space-x-2">
+                            <span>Apply for Position</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="bg-slate-100 rounded-2xl p-5 text-center text-slate-600">
+                        <p class="text-sm font-bold">Applications Closed</p>
+                        <p class="text-xs text-slate-500 mt-1">This job is currently not taking new applications.</p>
+                    </div>
+                {% endif %}
+
+                <!-- Share Opportunity Sidebar Card -->
+                <div class="p-4 rounded-2xl bg-gradient-to-br from-brand-50/70 to-white border border-brand-200/80 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-brand-800">Share This Role</span>
+                        <i data-lucide="share-2" class="w-4 h-4 text-brand-500"></i>
+                    </div>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Know someone who'd be a great fit? Share the job link across your network.
+                    </p>
+                    <div class="grid grid-cols-4 gap-2 pt-1">
+                        <button type="button" title="Copy Link" onclick="openShareModal('{{ job.title }}', '{{ url_for('job_detail', job_id=job.id) }}', '{{ job.department }}')" class="flex items-center justify-center p-2 rounded-xl bg-white hover:bg-brand-50 border border-brand-200 text-brand-700 transition shadow-sm">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url }}" target="_blank" rel="noopener noreferrer" title="Share on LinkedIn" class="flex items-center justify-center p-2 rounded-xl bg-white hover:bg-blue-50 border border-slate-200 text-blue-600 transition shadow-sm">
+                            <i data-lucide="linkedin" class="w-4 h-4"></i>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.url }}&text=Check%20out%20this%20{{ job.title }}%20opening!" target="_blank" rel="noopener noreferrer" title="Share on X (Twitter)" class="flex items-center justify-center p-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-800 transition shadow-sm">
+                            <i data-lucide="twitter" class="w-4 h-4"></i>
+                        </a>
+                        <a href="https://api.whatsapp.com/send?text=Check%20out%20this%20{{ job.title }}%20opening!%20{{ request.url }}" target="_blank" rel="noopener noreferrer" title="Share on WhatsApp" class="flex items-center justify-center p-2 rounded-xl bg-white hover:bg-emerald-50 border border-slate-200 text-emerald-600 transition shadow-sm">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                    <button type="button" onclick="openShareModal('{{ job.title }}', '{{ url_for('job_detail', job_id=job.id) }}', '{{ job.department }}')" class="w-full py-2 px-3 bg-white hover:bg-brand-50 border border-brand-200 text-brand-700 rounded-xl text-xs font-bold text-center transition flex items-center justify-center space-x-1.5 shadow-sm">
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                        <span>More Sharing Options</span>
+                    </button>
+                </div>
+
+                <!-- Company Highlights -->
+                <div class="pt-5 border-t border-slate-100 space-y-3 text-xs text-slate-600">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Why Work With Us</span>
+                    <div class="flex items-start space-x-2.5">
+                        <i data-lucide="shield" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>
+                        <span>Guaranteed feedback on all applications.</span>
+                    </div>
+                    <div class="flex items-start space-x-2.5">
+                        <i data-lucide="users" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>
+                        <span>Inclusive, collaborative culture with high autonomy.</span>
+                    </div>
+                    <div class="flex items-start space-x-2.5">
+                        <i data-lucide="zap" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>
+                        <span>Fast-moving hiring process with real-time status tracker.</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+

@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}SkyHire - Job Application Tracker | Find & Track Your Dream Job{% endblock %}
+
+{% block content %}
+<div class="space-y-16 py-6 sm:py-10">
+
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden pt-6 pb-14 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto text-center space-y-6">
+            
+            <!-- Badge -->
+            <div class="inline-flex items-center space-x-2 bg-brand-50 border border-brand-200 text-brand-700 px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm animate-pulse">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-brand-500"></i>
+                <span>Transparent Hiring • Real-time Application Statuses</span>
+            </div>
+
+            <!-- Headline -->
+            <h1 class="text-4xl sm:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
+                Track Every Step of Your <br class="hidden sm:inline" />
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-sky-400">Career Journey</span> With Clarity.
+            </h1>
+
+            <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                A seamless hiring platform where recruiters post high-impact roles and candidates trace every status update from submission to offer.
+            </p>
+
+            <!-- Search Form Bar -->
+            <div class="max-w-3xl mx-auto pt-4">
+                <form action="{{ url_for('jobs') }}" method="GET" class="bg-white p-2 sm:p-2.5 rounded-2xl shadow-xl shadow-brand-500/10 border border-brand-100 flex flex-col sm:flex-row items-center gap-2">
+                    <div class="relative flex-1 w-full">
+                        <i data-lucide="search" class="w-5 h-5 text-brand-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" name="q" placeholder="Job title, keywords, or skills..." class="w-full pl-11 pr-4 py-3 rounded-xl bg-transparent border-0 focus:ring-0 text-slate-800 placeholder-slate-400 text-sm focus:outline-none">
+                    </div>
+                    <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+                    <div class="relative w-full sm:w-56">
+                        <i data-lucide="briefcase" class="w-5 h-5 text-brand-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <select name="department" class="w-full pl-11 pr-8 py-3 rounded-xl bg-transparent border-0 focus:ring-0 text-slate-700 text-sm focus:outline-none appearance-none cursor-pointer">
+                            <option value="">All Departments</option>
+                            {% for dept in departments %}
+                                <option value="{{ dept }}">{{ dept }}</option>
+                            {% endfor %}
+                        </select>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    </div>
+                    <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition shadow-md shadow-brand-500/20 flex items-center justify-center space-x-2">
+                        <span>Search</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="pt-8 grid grid-cols-3 max-w-xl mx-auto gap-4">
+                <div class="p-3 bg-white rounded-xl border border-brand-100 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-brand-600">{{ stats.jobs }}</div>
+                    <div class="text-xs text-slate-500 font-medium">Active Openings</div>
+                </div>
+                <div class="p-3 bg-white rounded-xl border border-brand-100 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-slate-900">{{ stats.applications }}</div>
+                    <div class="text-xs text-slate-500 font-medium">Applications Tracked</div>
+                </div>
+                <div class="p-3 bg-white rounded-xl border border-brand-100 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-brand-500">{{ stats.candidates }}</div>
+                    <div class="text-xs text-slate-500 font-medium">Registered Talents</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Two-Sided Platform Value Cards -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Candidate Portal Card -->
+            <div class="bg-gradient-to-br from-white to-brand-50/60 p-8 rounded-3xl border border-brand-200/80 shadow-sm relative overflow-hidden group hover:border-brand-400 transition">
+                <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center mb-5 shadow-sm">
+                    <i data-lucide="user-check" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">For Job Seekers & Candidates</h3>
+                <p class="text-slate-600 text-sm leading-relaxed mb-6">
+                    Never wonder where your resume went. Follow your job applications with a transparent visual pipeline, receive feedback, and get interview notices in real-time.
+                </p>
+                <div class="flex flex-wrap gap-2.5 mb-6">
+                    <span class="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-brand-200 text-brand-700">
+                        <i data-lucide="check" class="w-3.5 h-3.5 mr-1 text-brand-500"></i> Interactive Status Tracker
+                    </span>
+                    <span class="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-brand-200 text-brand-700">
+                        <i data-lucide="check" class="w-3.5 h-3.5 mr-1 text-brand-500"></i> Resume Uploads
+                    </span>
+                    <span class="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-brand-200 text-brand-700">
+                        <i data-lucide="check" class="w-3.5 h-3.5 mr-1 text-brand-500"></i> Recruiter Feedback
+                    </span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="{{ url_for('jobs') }}" class="inline-flex items-center text-sm font-bold text-brand-600 hover:text-brand-800 transition">
+                        Explore Open Jobs <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                    </a>
+                    <span class="text-slate-300">|</span>
+                    <a href="{{ url_for('quick_login', role='candidate') }}" class="text-xs font-semibold text-slate-500 hover:text-brand-600 transition">
+                        Log in as Demo Candidate →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Admin / Recruiter Card -->
+            <div class="bg-gradient-to-br from-white to-sky-50/50 p-8 rounded-3xl border border-brand-200/80 shadow-sm relative overflow-hidden group hover:border-brand-400 transition">
+                <div class="w-12 h-12 rounded-2xl bg-brand-600 text-white flex items-center justify-center mb-5 shadow-sm shadow-brand-500/25">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">For Hiring Managers & Admins</h3>
+                <p class="text-slate-600 text-sm leading-relaxed mb-6">
+                    Create vacancies with detailed requirements, manage applicants across the pipeline, download candidate resumes, leave internal notes, and advance statuses.
+                </p>
+                <div class="flex flex-wrap gap-2.5 mb-6">
+                    <span class="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-brand-200 text-brand-700">
+                        <i data-lucide="check" class="w-3.5 h-3.5 mr-1 text-brand-500"></i> Job Post Management
+                    </span>
+                    <span class="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-brand-200 text-brand-700">
+                        <i data-lucide="check" class="w-3.5 h-3.5 mr-1 text-brand-500"></i> ATS Candidate Dossier
+                    </span>
+                    <span class="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-brand-200 text-brand-700">
+                        <i data-lucide="check" class="w-3.5 h-3.5 mr-1 text-brand-500"></i> One-Click Status Updates
+                    </span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="{{ url_for('admin_dashboard') }}" class="inline-flex items-center text-sm font-bold text-brand-600 hover:text-brand-800 transition">
+                        Open Recruiter Portal <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                    </a>
+                    <span class="text-slate-300">|</span>
+                    <a href="{{ url_for('quick_login', role='admin') }}" class="text-xs font-semibold text-slate-500 hover:text-brand-600 transition">
+                        Log in as Demo Admin →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Openings Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-brand-600">Explore Opportunities</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Featured Job Openings</h2>
+            </div>
+            <a href="{{ url_for('jobs') }}" class="inline-flex items-center space-x-1.5 text-sm font-semibold text-brand-600 hover:text-brand-700 transition">
+                <span>View All Open Positions</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for job in featured_jobs %}
+                <div class="bg-white rounded-2xl border border-brand-100 p-6 shadow-sm hover:shadow-md hover:border-brand-300 transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200">
+                                {{ job.department }}
+                            </span>
+                            <span class="text-xs text-slate-600 font-medium flex items-center">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 text-slate-600"></i>
+                                {{ job.created_at.strftime('%b %d') }}
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 line-clamp-1 hover:text-brand-600 transition">
+                            <a href="{{ url_for('job_detail', job_id=job.id) }}">{{ job.title }}</a>
+                        </h3>
+                        <p class="text-slate-500 text-xs mt-1 line-clamp-2">
+                            {{ job.description }}
+                        </p>
+                    </div>
+
+                    <div class="pt-5 mt-5 border-t border-slate-100">
+                        <div class="flex flex-wrap gap-y-2 justify-between items-center text-xs text-slate-600 mb-4">
+                            <span class="inline-flex items-center">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1 text-brand-500"></i>
+                                {{ job.location }}
+                            </span>
+                            <span class="inline-flex items-center font-semibold text-slate-700">
+                                <i data-lucide="banknote" class="w-3.5 h-3.5 mr-1 text-brand-500"></i>
+                                {{ job.salary_range or 'Competitive' }}
+                            </span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <a href="{{ url_for('job_detail', job_id=job.id) }}" class="flex-1 inline-flex items-center justify-center space-x-1.5 py-2.5 px-4 rounded-xl text-sm font-semibold text-brand-700 bg-brand-50 hover:bg-brand-600 hover:text-white transition">
+                                <span>View Role & Apply</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </a>
+                            <button type="button" onclick="quickShareJob(event, '{{ job.title }}', '{{ url_for('job_detail', job_id=job.id) }}', '{{ job.department }}')" title="Share Job" class="p-2.5 rounded-xl text-slate-400 hover:text-brand-600 hover:bg-brand-50 border border-slate-200 hover:border-brand-300 transition">
+                                <i data-lucide="share-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+</div>
+{% endblock %}
+

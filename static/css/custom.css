@@ -1,0 +1,47 @@
+/* SkyHire Custom Brand CSS - Light Blue & White Theme */
+
+:root {
+    --brand-primary: #0ea5e9;
+    --brand-dark: #0369a1;
+    --brand-light: #f0f9ff;
+    --brand-border: #bae6fd;
+}
+
+/* Subtle smooth transitions */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar in light blue tone */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f8fafc;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Drag and drop active states */
+.drag-over {
+    border-color: #0284c7 !important;
+    background-color: #e0f2fe !important;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+

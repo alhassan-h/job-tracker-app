@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}{% if job %}Edit {{ job.title }}{% else %}Post a New Job{% endif %} - SkyHire ATS{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+    <!-- Back Navigation -->
+    <a href="{{ url_for('admin_jobs') }}" class="inline-flex items-center text-xs font-semibold text-slate-500 hover:text-brand-600 transition">
+        <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Requisitions
+    </a>
+
+    <!-- Page Header -->
+    <div class="bg-gradient-to-r from-brand-600 to-sky-500 p-8 rounded-3xl text-white shadow-md shadow-brand-500/15">
+        <span class="text-xs font-bold uppercase tracking-wider text-brand-100">Requisition Form</span>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">
+            {% if job %}Edit Job Posting{% else %}Create New Job Opportunity{% endif %}
+        </h1>
+        <p class="text-xs sm:text-sm text-brand-100 mt-1">
+            Fill in the details below. Once set to "Active", candidates can immediately apply.
+        </p>
+    </div>
+
+    <!-- Form Container -->
+    <div class="bg-white rounded-3xl border border-brand-100 p-8 shadow-sm">
+        <form method="POST" action="{% if job %}{{ url_for('admin_edit_job', job_id=job.id) }}{% else %}{{ url_for('admin_create_job') }}{% endif %}" class="space-y-6">
+            
+            <!-- Basic Details -->
+            <div class="space-y-4">
+                <h2 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center space-x-2">
+                    <i data-lucide="briefcase" class="w-4 h-4 text-brand-600"></i>
+                    <span>Position Fundamentals</span>
+                </h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Job Title <span class="text-rose-500">*</span></label>
+                        <input type="text" name="title" required value="{{ job.title if job else '' }}" placeholder="e.g. Senior Backend Engineer" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Department</label>
+                        <input type="text" name="department" value="{{ job.department if job else 'Engineering' }}" placeholder="Engineering, Design, Marketing..." class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Location / Remote Policy</label>
+                        <input type="text" name="location" value="{{ job.location if job else 'Remote' }}" placeholder="Remote, New York, NY, Hybrid..." class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Job Type</label>
+                        <select name="job_type" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 bg-white">
+                            {% for jt in ['Full-time', 'Part-time', 'Contract', 'Internship'] %}
+                                <option value="{{ jt }}" {% if job and job.job_type == jt %}selected{% endif %}>{{ jt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Experience Level</label>
+                        <select name="experience_level" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 bg-white">
+                            {% for exp in ['Entry-Level', 'Mid-Level', 'Senior', 'Lead / Principal', 'Executive'] %}
+                                <option value="{{ exp }}" {% if job and job.experience_level == exp %}selected{% endif %}>{{ exp }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Salary Range</label>
+                        <input type="text" name="salary_range" value="{{ job.salary_range if job else '' }}" placeholder="e.g. $110,000 - $140,000 / yr" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Publication Status</label>
+                        <select name="status" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 bg-white">
+                            <option value="active" {% if job and job.status == 'active' %}selected{% endif %}>Active (Accepting Applications)</option>
+                            <option value="draft" {% if job and job.status == 'draft' %}selected{% endif %}>Draft (Hidden)</option>
+                            <option value="closed" {% if job and job.status == 'closed' %}selected{% endif %}>Closed (No longer accepting)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Copy -->
+            <div class="space-y-4 pt-4">
+                <h2 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center space-x-2">
+                    <i data-lucide="file-text" class="w-4 h-4 text-brand-600"></i>
+                    <span>Descriptions & Requirements</span>
+                </h2>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Job Overview & Responsibilities <span class="text-rose-500">*</span></label>
+                    <textarea name="description" rows="5" required placeholder="Outline the purpose of the role and key day-to-day responsibilities..." class="w-full px-4 py-3 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">{{ job.description if job else '' }}</textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Requirements & Qualifications</label>
+                    <textarea name="requirements" rows="4" placeholder="• 3+ years experience with...&#10;• Strong familiarity with...&#10;• Excellent problem solving skills..." class="w-full px-4 py-3 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">{{ job.requirements if job else '' }}</textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Perks & Benefits</label>
+                    <textarea name="benefits" rows="3" placeholder="• Comprehensive Health insurance&#10;• Unlimited PTO&#10;• Learning stipend..." class="w-full px-4 py-3 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">{{ job.benefits if job else '' }}</textarea>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="pt-6 border-t border-slate-100 flex items-center justify-between">
+                <a href="{{ url_for('admin_jobs') }}" class="text-sm font-semibold text-slate-500 hover:text-slate-800 transition">
+                    Cancel
+                </a>
+                <button type="submit" class="inline-flex items-center space-x-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold shadow-md shadow-brand-500/25 transition">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>{% if job %}Save Changes{% else %}Publish Job Post{% endif %}</span>
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}
+

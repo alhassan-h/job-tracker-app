@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Job Postings - SkyHire ATS{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-600">Recruitment Operations</span>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Job Requisitions</h1>
+            <p class="text-sm text-slate-500 mt-0.5">Post and manage open positions visible on the public career site.</p>
+        </div>
+        <a href="{{ url_for('admin_create_job') }}" class="inline-flex items-center space-x-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold shadow-md shadow-brand-500/20 transition">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Create New Job</span>
+        </a>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="bg-white p-4 rounded-2xl border border-brand-100 shadow-sm">
+        <form method="GET" action="{{ url_for('admin_jobs') }}" class="flex flex-col sm:flex-row items-center gap-3">
+            <div class="relative flex-1 w-full">
+                <input type="text" name="q" value="{{ current_search }}" placeholder="Search jobs by title..." class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            </div>
+            <div class="w-full sm:w-48">
+                <select name="status" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 bg-white">
+                    <option value="">All Statuses</option>
+                    <option value="active" {% if current_status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="closed" {% if current_status == 'closed' %}selected{% endif %}>Closed</option>
+                    <option value="draft" {% if current_status == 'draft' %}selected{% endif %}>Draft</option>
+                </select>
+            </div>
+            <button type="submit" class="w-full sm:w-auto px-5 py-2 bg-brand-50 text-brand-700 hover:bg-brand-100 border border-brand-200 rounded-xl text-sm font-semibold transition">
+                Filter
+            </button>
+            {% if current_search or current_status %}
+                <a href="{{ url_for('admin_jobs') }}" class="text-xs font-semibold text-slate-500 hover:text-slate-800">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Jobs Table -->
+    <div class="bg-white rounded-3xl border border-brand-100 shadow-sm overflow-hidden">
+        {% if jobs %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50/70 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200/80">
+                            <th class="py-3.5 px-6">Job Title & Details</th>
+                            <th class="py-3.5 px-6">Location & Type</th>
+                            <th class="py-3.5 px-6">Candidates</th>
+                            <th class="py-3.5 px-6">Status</th>
+                            <th class="py-3.5 px-6">Posted On</th>
+                            <th class="py-3.5 px-6 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm">
+                        {% for job in jobs %}
+                            <tr class="hover:bg-brand-50/30 transition">
+                                <td class="py-4 px-6">
+                                    <div class="font-bold text-slate-900">{{ job.title }}</div>
+                                    <div class="text-xs text-brand-600 font-semibold">{{ job.department }} • {{ job.experience_level }}</div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <div class="text-xs font-semibold text-slate-800">{{ job.location }}</div>
+                                    <div class="text-[11px] text-slate-500">{{ job.job_type }}</div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <a href="{{ url_for('admin_applications', job_id=job.id) }}" class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 transition">
+                                        <i data-lucide="users" class="w-3.5 h-3.5 mr-1 text-brand-500"></i>
+                                        {{ job.application_count }} applicant{{ 's' if job.application_count != 1 else '' }}
+                                    </a>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <form action="{{ url_for('admin_toggle_job_status', job_id=job.id) }}" method="POST" class="inline">
+                                        <button type="submit" title="Click to toggle status" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border transition
+                                            {% if job.status == 'active' %}
+                                                bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100
+                                            {% elif job.status == 'closed' %}
+                                                bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100
+                                            {% else %}
+                                                bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200
+                                            {% endif %}
+                                        ">
+                                            <span class="w-1.5 h-1.5 rounded-full mr-1.5 {% if job.status == 'active' %}bg-emerald-500{% else %}bg-rose-400{% endif %}"></span>
+                                            {{ job.status.capitalize() }}
+                                        </button>
+                                    </form>
+                                </td>
+                                <td class="py-4 px-6 text-xs text-slate-500">
+                                    {{ job.created_at.strftime('%b %d, %Y') }}
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <a href="{{ url_for('job_detail', job_id=job.id) }}" target="_blank" title="Preview Public Page" class="p-1.5 text-slate-400 hover:text-brand-600 rounded-lg hover:bg-slate-100 transition">
+                                            <i data-lucide="external-link" class="w-4 h-4"></i>
+                                        </a>
+                                        <a href="{{ url_for('admin_edit_job', job_id=job.id) }}" title="Edit Details" class="p-1.5 text-slate-400 hover:text-brand-600 rounded-lg hover:bg-slate-100 transition">
+                                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                        </a>
+                                        <form action="{{ url_for('admin_delete_job', job_id=job.id) }}" method="POST" onsubmit="return confirm('Delete this job posting and all attached applications? This cannot be undone.');" class="inline">
+                                            <button type="submit" title="Delete Job" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="p-12 text-center text-slate-400 text-sm">
+                No jobs found matching your criteria.
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+

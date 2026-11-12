@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account - SkyHire{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-12 space-y-6">
+
+    <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 to-brand-400 text-white flex items-center justify-center mx-auto shadow-md shadow-brand-500/20">
+            <i data-lucide="user-plus" class="w-6 h-6"></i>
+        </div>
+        <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Create an Account</h1>
+        <p class="text-xs text-slate-500">Join SkyHire as a Job Seeker or Hiring Manager</p>
+    </div>
+
+    <!-- Registration Card -->
+    <div class="bg-white rounded-3xl border border-brand-100 p-8 shadow-sm">
+        <form method="POST" action="{{ url_for('register') }}" class="space-y-4">
+            
+            <!-- Account Role Selection -->
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">I want to:</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-brand-200 hover:border-brand-500 cursor-pointer text-center space-y-1 transition has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/50">
+                        <input type="radio" name="role" value="candidate" checked class="sr-only">
+                        <i data-lucide="user" class="w-5 h-5 text-brand-600"></i>
+                        <span class="text-xs font-bold text-slate-900">Find & Track Jobs</span>
+                        <span class="text-[10px] text-slate-500">Candidate</span>
+                    </label>
+                    <label class="flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-brand-200 hover:border-brand-500 cursor-pointer text-center space-y-1 transition has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/50">
+                        <input type="radio" name="role" value="admin" class="sr-only">
+                        <i data-lucide="briefcase" class="w-5 h-5 text-brand-600"></i>
+                        <span class="text-xs font-bold text-slate-900">Post Jobs & Hire</span>
+                        <span class="text-[10px] text-slate-500">Administrator</span>
+                    </label>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Full Name</label>
+                <input type="text" name="full_name" required placeholder="Jane Doe" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Username</label>
+                <input type="text" name="username" required placeholder="janedoe" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Email Address</label>
+                <input type="email" name="email" required placeholder="jane@example.com" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Phone Number (Optional)</label>
+                <input type="tel" name="phone" placeholder="+1 (555) 123-4567" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Password</label>
+                <input type="password" name="password" required placeholder="At least 6 characters" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+            </div>
+
+            <button type="submit" class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold shadow-md shadow-brand-500/25 transition flex items-center justify-center space-x-2">
+                <span>Create Account</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+        </form>
+
+        <div class="mt-6 pt-5 border-t border-slate-100 text-center text-xs text-slate-500">
+            Already registered? 
+            <a href="{{ url_for('login') }}" class="font-bold text-brand-600 hover:text-brand-800">
+                Sign in
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
