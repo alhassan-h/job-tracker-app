@@ -3,12 +3,17 @@ from datetime import datetime, timedelta
 from app import app
 from models import db, User, Job, Application, TimelineEvent
 
-def seed_database():
+def seed_database(drop_tables=True):
     with app.app_context():
-        # Drop all tables and recreate clean
-        print("Recreating database tables...")
-        db.drop_all()
-        db.create_all()
+        if drop_tables:
+            print("Recreating database tables...")
+            db.drop_all()
+            db.create_all()
+        else:
+            db.create_all()
+            if User.query.first() is not None:
+                print("Database already contains data, skipping seed.")
+                return
 
         print("Seeding initial users...")
         # 1. Admin Account

@@ -27,6 +27,25 @@ login_manager.login_view = 'login'
 login_manager.login_message = 'Please log in to access this page.'
 login_manager.login_message_category = 'info'
 
+# Auto-initialize database schema & seed demo data on first start (essential for Vercel /tmp storage)
+with app.app_context():
+    try:
+        db.create_all()
+        sample_src = os.path.join(Config.BASE_DIR, 'uploads', 'resumes', 'Sarah_Miller_Resume_2026.pdf')
+        sample_dst = os.path.join(app.config['UPLOAD_FOLDER'], 'Sarah_Miller_Resume_2026.pdf')
+        if os.path.exists(sample_src) and not os.path.exists(sample_dst):
+            import shutil
+            try:
+                shutil.copy2(sample_src, sample_dst)
+            except Exception:
+                pass
+
+        if User.query.first() is None:
+            from seed_data import seed_database
+            seed_database(drop_tables=False)
+    except Exception as e:
+        app.logger.warning(f"Database auto-init: {e}")
+
 
 @login_manager.user_loader
 def load_user(user_id):

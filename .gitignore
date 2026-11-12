@@ -48,3 +48,9 @@ job_tracker.db
 # OS files
 .DS_Store
 Thumbs.db
+
+# User uploads (keep demo resume and .gitkeep)
+uploads/resumes/*
+!uploads/resumes/.gitkeep
+!uploads/resumes/Sarah_Miller_Resume_2026.pdf
+
